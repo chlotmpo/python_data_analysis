@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+from streamlit_pandas_profiling import st_profile_report
+from pandas_profiling import ProfileReport
+
 import base64
 import csv
 import time
@@ -10,6 +13,8 @@ from PIL import Image
 
 from st_btn_select import st_btn_select
 import hydralit_components as hc
+
+import streamlit.components.v1 as components
 
 #https://docs.streamlit.io/library/api-reference/widgets
 
@@ -56,11 +61,11 @@ def navigationBar():
     # Navigation Bar V3
     # items NavBar
     menu_data = [
-        {'label' : 'Project', 'id' : 'project'},
+        {'label':'Project', 'id' : 'project'},
         {'label':"Dataset", 'id' : 'dataset'},
         {'label':"Data Visualization", 'id' : 'dataviz'},
-        {'label':"Machine Learning", 'id' : 'ml'}]
-        #{'label':"GitHub", 'id' : 'github'}]
+        {'label':"Machine Learning", 'id' : 'ml'},
+        {'label':"GitHub", 'id' : 'github'}]
 
     over_theme = {'txc_inactive': '#FFFFFF'} # ,'menu_background':'red','txc_active':'yellow','option_active':'blue'}
 
@@ -84,6 +89,11 @@ def app():
     structure()
     navigationBar()
     # ---------------------------------------------  Content  --------------------------------------------   
+    
+    dataset = load_dataset()
+    dataset = dataset[:50]
+    report = load_report(dataset)
+    
     if menu_id == 'project':
         col1, col2, col3 = st.columns([2,6,2])
 
@@ -112,12 +122,14 @@ def app():
         
     if menu_id == 'dataset':
         st.title('Diabetes Dataset:')
-        st.dataframe(load_dataset())
+        st.dataframe(dataset)
         st.markdown(get_table_download_link(load_dataset()), unsafe_allow_html=True)
 
 
     if menu_id == 'dataviz':
         st.title('Data Visualization')
+        
+        st_profile_report(load_report(dataset))
         
         img = Image.open(r"Resources\AgeDistribution.png")
         st.image(img)
@@ -127,10 +139,10 @@ def app():
 
     if menu_id == 'ml':
         st.title('Machine Learning')
-        st.checkbox()
         
-    #if menu_id == 'github':
-        #st.title('[GitHub](https://github.com/chlotmpo/python_data_analysis)')
+    if menu_id == 'github':
+        st.title('GitHub')
+        #components.iframe('https://github.com/chlotmpo/python_data_analysis')
     # --------------------------------------------------------------------------------------------------
 
     
@@ -145,9 +157,14 @@ def app():
 def load_dataset():
     #path = r'C:\Users\mt181547\OneDrive - De Vinci\Bureau\diabetic_data.csv'
     path = r'Resources\diabetic_data.csv'
-    dataset = pd.read_csv(path, sep=',')
-    dataset2 = dataset[dataset["weight"] != '?']
-    return dataset2
+    dataset = pd.read_csv(path, sep =',', na_values="?", low_memory = False)
+    return dataset
+
+
+def load_report(dataset):
+    report = ProfileReport(dataset, title = "Diabetes dataset overview", dark_mode = True)
+    return report
+
 
 def get_table_download_link(df):
     csv = df.to_csv(index=False)
