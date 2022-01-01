@@ -63,9 +63,8 @@ def navigationBar():
     menu_data = [
         {'label':'Project', 'id' : 'project'},
         {'label':"Dataset", 'id' : 'dataset'},
-        {'label':"Data Visualization", 'id' : 'dataviz'},
-        {'label':"Machine Learning", 'id' : 'ml'},
-        {'label':"GitHub", 'id' : 'github'}]
+        {'label':"Notebook", 'id' : 'notebook'},
+        {'label':"Machine Learning", 'id' : 'ml'}]
 
     over_theme = {'txc_inactive': '#FFFFFF'} # ,'menu_background':'red','txc_active':'yellow','option_active':'blue'}
 
@@ -92,25 +91,16 @@ def app():
     
     dataset = load_dataset()
     dataset = dataset[:50]
-    report = load_report(dataset)
+    #report = load_report(dataset)
     
-    if menu_id == 'project':
-        col1, col2, col3 = st.columns([2,6,2])
-
-
-        with col1:
-            st.write(str([x for x in range(50)]))
-
-        with col2:
-            st.title('\tAnalysis of diabetes dataset')
-
-        with col3:
-            st.write(str([x for x in range(50)]))
-            
         
-        img = Image.open(r"Resources\diabete.jpg")
-        st.image(img)
-        st.markdown('\tHospital readmission is a real-world problem and an on-going topic for improving \
+    if menu_id == 'project':
+        
+        col1, col2, col3 = st.columns([1,6,1])
+        
+        with col2:
+            st.title('Analysis of diabetes dataset')
+            st.markdown('\t Hospital readmission is a real-world problem and an on-going topic for improving \
                     health care quality and a patient’s experience, while ensuring cost-effectiveness. \
                     Information of Hospital Readmissions Reduction Program (HRRP) is publicly\
                     available in CMS, Center for Medicare and Medicaid Services, web site.\
@@ -118,31 +108,81 @@ def app():
                     was downloaded from UCI Machine Learning Repository. It represents 10 years \
                     (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks \
                     with 100,000 observations and 50 features representing patient and hospital outcomes.')
+        
         st.title('[GitHub](https://github.com/chlotmpo/python_data_analysis)')
+            
+            
+        
+        
+        
+        
+        img = Image.open(r"Resources\diabete.jpg")
+        st.image(img)
         
     if menu_id == 'dataset':
         st.title('Diabetes Dataset:')
-        st.dataframe(dataset)
-        st.markdown(get_table_download_link(load_dataset()), unsafe_allow_html=True)
+        st.markdown('\t This dataset represents 10 years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. It includes over 50 features representing patient and hospital outcomes. \nInformation was extracted from the database for encounters that satisfied the following criteria.\
+                        \n - (1) It is an inpatient encounter (a hospital admission).\
+                        \n - (2) It is a diabetic encounter, that is, one during which any kind of diabetes was entered to the system as a diagnosis.\
+                        \n - (3) The length of stay was at least 1 day and at most 14 days.\
+                        \n - (4) Laboratory tests were performed during the encounter.\
+                        \n - (5) Medications were administered during the encounter.')
+        st.title('')
+        st.dataframe(dataset,1200, 500)
+        st.download_button(label = 'Download', data = dataset.to_csv(), file_name='diabetes_sample.csv',mime='text/csv')
 
 
-    if menu_id == 'dataviz':
-        st.title('Data Visualization')
+    if menu_id == 'notebook':
+        st.title('Jupyter Notebook')
         
-        st_profile_report(load_report(dataset))
+        HtmlFile = open(r"..\\Notebook_diabetes\\Notebook_diabetes.html", 'r', encoding='utf-8')
+        source_code = HtmlFile.read()
         
-        img = Image.open(r"Resources\AgeDistribution.png")
-        st.image(img)
+        col1, col2, col3 = st.columns([6,1,1])
+        with col1:
+            st.write('You can find here our Jupyter Notebook: ')
+        with col3:
+            st.download_button(label = 'Download', data = source_code, file_name='notebook.html', mime = 'html')
+         
+        components.html(source_code, height = 60000)
         
-        st.code('df = pd.read_csv(path, sep = ","')
-        st.code('Texte')
+            
 
     if menu_id == 'ml':
-        st.title('Machine Learning')
         
-    if menu_id == 'github':
-        st.title('GitHub')
-        #components.iframe('https://github.com/chlotmpo/python_data_analysis')
+        st.title('Machine Learning')
+            
+        st.write("We use the diabetes dataset to train some Machine Learning algorithms in order\
+                    to predict the readmission of a patient\n \
+                    Before any modifications, the readmitted features was composed of 3 different values: \
+                    \n - No (No readmission)\
+                    \n - < 30 (Readmitted under 30 days)\
+                    \n - \> 30 (readmitted under or above 30 days)")
+        st.write("Based on that, we had to transform this into a binary decision.\
+                      Hence some values had to be regrouped.\
+                    \n We chose first to regroupe (No) and (>30). This means that the decision is reduced to :\
+                    \n > Is the patient going to be readmitted under 30 days ? (Yes or No)")
+        st.write("Next, we regrouped (<30) and (>30). This time, the decision is reduced to :\
+                      \n > Is the patient going to be readmitted ? (Yes or No)")
+        st.title('')
+        
+        
+        #divide page in two columns to compare the two different approaches
+        col1, col2 = st.columns([1,1]) 
+        with col1:
+            st.header("Case 1 :")
+            st.header("Predict patient's readmission under 30 days")
+            
+            
+        with col2:
+            st.header("Case 2 :")
+            st.header("Predict patient's readmission under and above 30 days")
+
+
+    
+        
+        
+    #components.iframe('https://github.com/chlotmpo/python_data_analysis')
     # --------------------------------------------------------------------------------------------------
 
     
@@ -161,17 +201,17 @@ def load_dataset():
     return dataset
 
 
-def load_report(dataset):
-    report = ProfileReport(dataset, title = "Diabetes dataset overview", dark_mode = True)
-    return report
+#def load_report(dataset):
+#    report = ProfileReport(dataset, title = "Diabetes dataset overview", dark_mode = True)
+#    return report
 
 
-def get_table_download_link(df):
-    csv = df.to_csv(index=False)
-    # some strings <-> bytes conversions necessary here
-    b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
-    return href
+#def get_table_download_link(df):
+#    csv = df.to_csv(index=False)
+#    # some strings <-> bytes conversions necessary here
+#    b64 = base64.b64encode(csv.encode()).decode()
+#    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
+#    return href
 
 # ---------------------------------------------------------------------------------------------
 
