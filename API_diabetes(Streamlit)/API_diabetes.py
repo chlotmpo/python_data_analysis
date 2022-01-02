@@ -1,29 +1,18 @@
-import streamlit as st
 import pandas as pd
-import numpy as np
 
-from streamlit_pandas_profiling import st_profile_report
-from pandas_profiling import ProfileReport
-
-import base64
-import csv
-import time
+import streamlit as st
+import hydralit_components as hc
+import streamlit.components.v1 as components
 
 from PIL import Image
 
-from st_btn_select import st_btn_select
-import hydralit_components as hc
-
-import streamlit.components.v1 as components
-
-#https://docs.streamlit.io/library/api-reference/widgets
-
+# -------------------------------------------  Structure  ------------------------------------------
 def structure():
-    # -------------------------------------------  Structure  ------------------------------------------
+    
     # Titre page
     st.set_page_config(page_title = "DIABETES",layout = "wide")
 
-    # Masquer menu de reglages
+    # Hide settings menu, header and footer
     st.markdown(""" <style>
                 #MainMenu {visibility: hidden;}
                 header {visibility: hidden;}
@@ -42,42 +31,29 @@ def structure():
                         color:#ff0000;
                         }
                     </style>""", unsafe_allow_html=True)
-    # --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 
-
-
-
-
-
+# ----------------------------------------  Navigation Bar  ----------------------------------------
 def navigationBar():
-    # ----------------------------------------  Navigation Bar  ----------------------------------------
-
-    # Navigation Bar V1
-    #st.markdown('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">', unsafe_allow_html=True)
-
-    # Navigation Bar V2
-    #page = st_btn_select(('Home', 'Dataset', 'DataViz', 'Machine Learning', 'PLUS'), nav = True, index = 0)
-
-    # Navigation Bar V3
+    
     # items NavBar
     menu_data = [
         {'label':'Project', 'id' : 'project'},
         {'label':"Dataset", 'id' : 'dataset'},
         {'label':"Notebook", 'id' : 'notebook'},
         {'label':"Machine Learning", 'id' : 'ml'}]
-
     over_theme = {'txc_inactive': '#FFFFFF'} # ,'menu_background':'red','txc_active':'yellow','option_active':'blue'}
 
     # structure NavBar
     global menu_id
-    menu_id = hc.nav_bar(menu_definition = menu_data,
+    menu_id = hc.nav_bar(
+        menu_definition = menu_data,
         override_theme=over_theme,
         #home_name='Home',
         #login_name='Logout',
-        hide_streamlit_markers=False, #will show the st hamburger as well as the navbar now!
-        sticky_nav=True, #at the top or not
-        sticky_mode='sticky', #jumpy or not-jumpy, but sticky or pinned
-    )
+        hide_streamlit_markers=False, 
+        sticky_nav=True, 
+        sticky_mode='sticky')
     # --------------------------------------------------------------------------------------------------
 
 
@@ -85,39 +61,57 @@ def navigationBar():
 
 
 def app():
+    
     structure()
     navigationBar()
+    
     # ---------------------------------------------  Content  --------------------------------------------   
-    
     dataset = load_dataset()
-    dataset = dataset[:50]
-    #report = load_report(dataset)
+    dataset = dataset[:101]
+    notebook_html = load_notebook()
     
+    if menu_id == 'project': 
+        st.title('Analysis of dataset')
         
-    if menu_id == 'project':
+        st.subheader('PowerPoint:')
+        st.markdown('- A PowerPoint explaining the ins and outs of the problem, your thoughts on the asked question,\
+                    \n the different variables you created, how the problem fits in the context of the study')
         
-        col1, col2, col3 = st.columns([1,6,1])
+        st.subheader('Python:')
+        st.markdown('- Data-visualization (use matplotlib, seaborn, bokeh ...): show the link between the variables and the target \
+                    \n - Modeling: use the scikit-learn library to try several algorithms, change the hyper parameters, do a grid search, \
+                    \n compare the results of your models using graphics')
         
+        st.subheader('API:')
+        st.markdown('- Transformation of the model into an API of your choice')
+        
+        st.subheader('Dataset')
+        st.markdown('- Diabetes dataset')
+        st.markdown('[https://archive.ics.uci.edu/ml/datasets/Diabetes+130-US+hospitals+for+years+1999-2008](https://archive.ics.uci.edu/ml/datasets/Diabetes+130-US+hospitals+for+years+1999-2008)')
+        
+        st.subheader('Team:')
+        st.markdown(' Chloé TEMPO & Matthieu THIBAUT')
+        
+#To analyze the dataset, you should answer the following questions:
+# 1. A PowerPoint explaining the ins and outs of the problem, your thoughts on the asked
+# question, the different variables you created, how the problem fits in the context of the
+# study, etc: 25%.
+# 2. A code in python:
+# a) Data-visualization (use matplotlib, seaborn, bokeh ...): show the link between
+# the variables and the target: 25%.
+# b) Modeling: use the scikit-learn library to try several algorithms, change the
+# hyper parameters, do a grid search, compare the results of your models using
+# graphics: 30%
+# 3. Transformation of the model into an API of your choice (Django or flask): 20
+        
+        st.title('')
+        col1, col2 = st.columns([1,2])
+        with col1:
+            st.header('Link of the repository:')
         with col2:
-            st.title('Analysis of diabetes dataset')
-            st.markdown('\t Hospital readmission is a real-world problem and an on-going topic for improving \
-                    health care quality and a patient’s experience, while ensuring cost-effectiveness. \
-                    Information of Hospital Readmissions Reduction Program (HRRP) is publicly\
-                    available in CMS, Center for Medicare and Medicaid Services, web site.\
-                    The dataset, Diabetes 130-US hospitals for years 1999-2008 Data Set, \
-                    was downloaded from UCI Machine Learning Repository. It represents 10 years \
-                    (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks \
-                    with 100,000 observations and 50 features representing patient and hospital outcomes.')
-        
-        st.title('[GitHub](https://github.com/chlotmpo/python_data_analysis)')
-            
-            
-        
-        
-        
-        
-        img = Image.open(r"Resources\diabete.jpg")
-        st.image(img)
+            st.header('[GitHub](https://github.com/chlotmpo/python_data_analysis)')
+        #img = Image.open(r"Resources\diabete.jpg")
+        #st.image(img)
         
     if menu_id == 'dataset':
         st.title('Diabetes Dataset:')
@@ -127,24 +121,37 @@ def app():
                         \n - (3) The length of stay was at least 1 day and at most 14 days.\
                         \n - (4) Laboratory tests were performed during the encounter.\
                         \n - (5) Medications were administered during the encounter.')
-        st.title('')
-        st.dataframe(dataset,1200, 500)
-        st.download_button(label = 'Download', data = dataset.to_csv(), file_name='diabetes_sample.csv',mime='text/csv')
-
-
-    if menu_id == 'notebook':
-        st.title('Jupyter Notebook')
-        
-        HtmlFile = open(r"..\\Notebook_diabetes\\Notebook_diabetes.html", 'r', encoding='utf-8')
-        source_code = HtmlFile.read()
         
         col1, col2, col3 = st.columns([6,1,1])
         with col1:
-            st.write('You can find here our Jupyter Notebook: ')
+            st.subheader('Dataset sample:')
         with col3:
-            st.download_button(label = 'Download', data = source_code, file_name='notebook.html', mime = 'html')
+            st.download_button(label = 'Download', data = dataset.to_csv(), file_name='diabetes_sample.csv',mime='text/csv')
+        st.dataframe(dataset,1200, 500)
+        
+        st.title('')
+        st.subheader('Source:')
+        st.markdown('\t The data are submitted on behalf of the Center for Clinical and Translational Research, Virginia Commonwealth University, \
+                        \n a recipient of NIH CTSA grant UL1 TR00058 and a recipient of the CERNER data. \
+                        \n - John Clore (jclore vcu.edu), Krzysztof J. Cios (kcios@vcu.edu), \
+                        \n - Jon DeShazo (jpdeshazo@vcu.edu) \
+                        \n - Beata Strack (strackb@vcu.edu).')
+        st.markdown('This data is a de-identified abstract of the Health Facts database (Cerner Corporation, Kansas City, MO).')
+        
+        st.title('')
+        st.subheader('Citation:')
+        st.markdown('Beata Strack, Jonathan P. DeShazo, Chris Gennings, Juan L. Olmo, Sebastian Ventura, Krzysztof J. Cios, and John N. Clore, “Impact of HbA1c Measurement on Hospital Readmission Rates: Analysis of 70,000 Clinical Database Patient Records,” BioMed Research International, vol. 2014, Article ID 781670, 11 pages, 2014.')        
+        st.markdown('[https://www.hindawi.com/journals/bmri/2014/781670/](https://www.hindawi.com/journals/bmri/2014/781670/)')
+   
+    if menu_id == 'notebook':
+        st.title('Jupyter Notebook')
+        col1, col2, col3 = st.columns([6,1,1])
+        with col1:
+            st.write('You can find here our work: ')
+        with col3:
+            st.download_button(label = 'Download', data = notebook_html, file_name='notebook.html', mime = 'html')
          
-        components.html(source_code, height = 60000)
+        components.html(notebook_html, height = 60000)
         
             
 
@@ -167,16 +174,23 @@ def app():
         st.title('')
         
         
+        summaryML = pd.read_csv(r"..\\summary_ML.csv", sep =';', header=[1])
+        case1 = summaryML[['Model', 'Score', 'Accuracy']]
+        case2 = summaryML[['Model.1', 'Score.1', 'Accuracy.1']]
+        case2.columns = case1.columns
+        
         #divide page in two columns to compare the two different approaches
         col1, col2 = st.columns([1,1]) 
         with col1:
             st.header("Case 1 :")
             st.header("Predict patient's readmission under 30 days")
+            st.write(case1.style.hide_index().to_html(), unsafe_allow_html=True)
             
             
         with col2:
             st.header("Case 2 :")
             st.header("Predict patient's readmission under and above 30 days")
+            st.write(case2.style.hide_index().to_html(), unsafe_allow_html=True)
 
 
     
@@ -195,11 +209,15 @@ def app():
 # Chargement du dataset en cache
 @st.cache # We store the dataset in cache so it can be displayed faster
 def load_dataset():
-    #path = r'C:\Users\mt181547\OneDrive - De Vinci\Bureau\diabetic_data.csv'
-    path = r'Resources\diabetic_data.csv'
+    path = "Resources\\diabetic_data.csv"
     dataset = pd.read_csv(path, sep =',', na_values="?", low_memory = False)
     return dataset
 
+@st.cache
+def load_notebook():
+    HtmlFile = open(r"..\\Notebook_diabetes\\Notebook_diabetes.html", 'r', encoding='utf-8')
+    return HtmlFile.read()
+    
 
 #def load_report(dataset):
 #    report = ProfileReport(dataset, title = "Diabetes dataset overview", dark_mode = True)
