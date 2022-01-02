@@ -1,3 +1,4 @@
+# ---------------------------------------  Import Libraries  --------------------------------------
 import pandas as pd
 
 import streamlit as st
@@ -9,8 +10,8 @@ from PIL import Image
 # -------------------------------------------  Structure  ------------------------------------------
 def structure():
     
-    # Titre page
-    st.set_page_config(page_title = "DIABETES",layout = "wide")
+    # Title of the page
+    st.set_page_config(page_title = "Diabetes Analysis Project",layout = "wide")
 
     # Hide settings menu, header and footer
     st.markdown(""" <style>
@@ -19,7 +20,7 @@ def structure():
                 footer {visibility: hidden;}
                 </style> """, unsafe_allow_html=True)
 
-    # Style boutons
+    # Style buttons
     m = st.markdown("""
                     <style>
                     div.stButton > button:first-child {
@@ -74,7 +75,7 @@ def app():
         st.title('Analysis of dataset')
         
         st.subheader('PowerPoint:')
-        st.markdown('- A PowerPoint explaining the ins and outs of the problem, your thoughts on the asked question,\
+        st.markdown('- A presentation explaining the ins and outs of the problem, your thoughts on the asked question,\
                     \n the different variables you created, how the problem fits in the context of the study')
         
         st.subheader('Python:')
@@ -92,26 +93,12 @@ def app():
         st.subheader('Team:')
         st.markdown(' Chloé TEMPO & Matthieu THIBAUT')
         
-#To analyze the dataset, you should answer the following questions:
-# 1. A PowerPoint explaining the ins and outs of the problem, your thoughts on the asked
-# question, the different variables you created, how the problem fits in the context of the
-# study, etc: 25%.
-# 2. A code in python:
-# a) Data-visualization (use matplotlib, seaborn, bokeh ...): show the link between
-# the variables and the target: 25%.
-# b) Modeling: use the scikit-learn library to try several algorithms, change the
-# hyper parameters, do a grid search, compare the results of your models using
-# graphics: 30%
-# 3. Transformation of the model into an API of your choice (Django or flask): 20
-        
         st.title('')
         col1, col2 = st.columns([1,2])
         with col1:
             st.header('Link of the repository:')
         with col2:
             st.header('[GitHub](https://github.com/chlotmpo/python_data_analysis)')
-        #img = Image.open(r"Resources\diabete.jpg")
-        #st.image(img)
         
     if menu_id == 'dataset':
         st.title('Diabetes Dataset:')
@@ -141,7 +128,7 @@ def app():
         st.title('')
         st.subheader('Citation:')
         st.markdown('Beata Strack, Jonathan P. DeShazo, Chris Gennings, Juan L. Olmo, Sebastian Ventura, Krzysztof J. Cios, and John N. Clore, “Impact of HbA1c Measurement on Hospital Readmission Rates: Analysis of 70,000 Clinical Database Patient Records,” BioMed Research International, vol. 2014, Article ID 781670, 11 pages, 2014.')        
-        st.markdown('[https://www.hindawi.com/journals/bmri/2014/781670/](https://www.hindawi.com/journals/bmri/2014/781670/)')
+        st.markdown('[Impact of HbA1c Measurement on Hospital Readmission Rates: Analysis of 70,000 Clinical Database Patient Records](https://www.hindawi.com/journals/bmri/2014/781670/)')
    
     if menu_id == 'notebook':
         st.title('Jupyter Notebook')
@@ -152,8 +139,6 @@ def app():
             st.download_button(label = 'Download', data = notebook_html, file_name='notebook.html', mime = 'html')
          
         components.html(notebook_html, height = 60000)
-        
-            
 
     if menu_id == 'ml':
         
@@ -173,43 +158,36 @@ def app():
                       \n > Is the patient going to be readmitted ? (Yes or No)")
         st.title('')
         
-        
-        summaryML = pd.read_csv(r"..\\summary_ML.csv", sep =';', header=[1])
+        # load the summary dataset (results of our ML models)
+        summaryML = pd.read_csv(r"..\\Dataset\\summary_ML.csv", sep =';', header=[1])
         case1 = summaryML[['Model', 'Score', 'Accuracy']]
         case2 = summaryML[['Model.1', 'Score.1', 'Accuracy.1']]
         case2.columns = case1.columns
         
         #divide page in two columns to compare the two different approaches
         col1, col2 = st.columns([1,1]) 
+        
         with col1:
             st.header("Case 1 :")
             st.header("Predict patient's readmission under 30 days")
-            st.write(case1.style.hide_index().to_html(), unsafe_allow_html=True)
-            
+            st.write(case1.style.hide_index().to_html(), unsafe_allow_html=True)         
             
         with col2:
             st.header("Case 2 :")
             st.header("Predict patient's readmission under and above 30 days")
-            st.write(case2.style.hide_index().to_html(), unsafe_allow_html=True)
-
-
-    
-        
-        
-    #components.iframe('https://github.com/chlotmpo/python_data_analysis')
-    # --------------------------------------------------------------------------------------------------
-
-    
-    
-    
-    
+            st.write(case2.style.hide_index().to_html(), unsafe_allow_html=True)  
+            
+        st.title('')
+        st.markdown('We can see that the differents models performed better in case 1 but as mentionned earlier it is not surprising \
+                    \n because the two categories to predict were unbalanced. \
+                    \n In case 2, we lost some accuracy but it is a much more realistic modelization')  
     
 # ----------------------------------------  Fonctions  ----------------------------------------
 
 # Chargement du dataset en cache
 @st.cache # We store the dataset in cache so it can be displayed faster
 def load_dataset():
-    path = "Resources\\diabetic_data.csv"
+    path = r"..\\Dataset\\diabetic_data.csv"
     dataset = pd.read_csv(path, sep =',', na_values="?", low_memory = False)
     return dataset
 
@@ -217,24 +195,8 @@ def load_dataset():
 def load_notebook():
     HtmlFile = open(r"..\\Notebook_diabetes\\Notebook_diabetes.html", 'r', encoding='utf-8')
     return HtmlFile.read()
-    
 
-#def load_report(dataset):
-#    report = ProfileReport(dataset, title = "Diabetes dataset overview", dark_mode = True)
-#    return report
-
-
-#def get_table_download_link(df):
-#    csv = df.to_csv(index=False)
-#    # some strings <-> bytes conversions necessary here
-#    b64 = base64.b64encode(csv.encode()).decode()
-#    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
-#    return href
-
-# ---------------------------------------------------------------------------------------------
-
-
-# Main
+# -------------------------------------------  Main  -------------------------------------------
 if __name__ == '__main__' :
     app()
 
