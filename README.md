@@ -17,7 +17,7 @@ As part of the python for data analysis course, the aim of end of the semester's
   - [summary_ML](./Dataset/summary_ML)
 - [Notebook_diabetes](./Notebook_diabetes/)
   - [Notebook_diabetes.ipynb](./Notebook_diabetes/Notebook_diabetes.ipynb)
-  - [Notebook_diabetes.html](./Notebook_diabetes/Notebook_diabetes.html)
+  - [Notebook_diabetes.html](./Notebook_diabetes/Notebook_diabetes.html) 
 -[ReadMe.md](./README.md)
 
 
