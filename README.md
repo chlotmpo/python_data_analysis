@@ -42,6 +42,49 @@ This presentation includes less text and is used for an oral presentation of the
 - [ReadMe.md](./README.md)
 You are on the ReadMe.md file. 
 
+## Progress of the project 
+
+### Data loading and cleaning 
+First, you must download and recover the data set in our jupyter notebook. In order to be able to treat it afterwards, we must observe it in detail to clean it as well as possible. This involves abandoning columns with too many missing values, or those that have no utilities or values that are too redundant. The same goes for the lines. You should also pay attention to the column types when retrieving the dataset.
+This step is very important because it conditions the whole sequence. We can also map some columns so that it is easier to represent real understandable situations during visualization. 
+
+### Data analysis and visualization
+The next step is a first analysis of the data and the different characteristics of the dataset. We are going to do visualization to try to find links, behaviors between variables to better understand the hidden meanings behind the data. The graphs make these visual results easier to understand and communicate. 
+All graphics are visible in the jupyter notebook. Adding a correlation matrix is of great interest to glimpse the variables that may or may not be correlated.
+
+### Machine Learning - Models Implementation
+The aim of this section is to use the diabetes dataset to train some Machine Learning models using the diabete dataset in order to predict the readmission of a patient. 
+
+After preparing a machine learning oriented dataset from the original dataset, we decided to distinguish two cases according to the data:
+- Case 1: Predict patient’s readmission under 30 days
+- Case 2: Predict patient’s readmission under and above 30 days
+
+In this study, we try to predict a qualitative binary variable. We also have a fairly large set of data, which leads us to use some models more than others.
+
+We therefore tested and implemented the following models to compare their prediction performance :
+- K-Nearest Neighbors (KNN) 
+- Logistic Regression 
+- Linear SVC 
+- Random Forest 
+- Adaptive Boosting 
+- Decision Tree
+- Extra Trees 
+- Naïve Bayes Classifier
+
+All the results and performance of each model are available in the jupyter notebook.
+
+### Machine Learning - Models Tuning 
+With the help of the libraries, we can search for the best possible parameters for the different models and therefore try to improve the performance of each one. This was established in this phase. All the results obtained for the different models are also available in the jupyter notebook.
+
+## API 
+To make the project a little more visual and accessible, we created a streamlit project that we linked to our python code to create an API. It presents different tabs with the description of the dataset, the notebook, our results in machine learning and an interactive parts. 
+
+## Conclusion
+After observing the results, the following conclusions can be drawn. 
+- For case number 1, we can see that the predictions are made with a rather high score but we must qualify this result because the problem is unbalanced. You can't really rely on those results. 
+- For case number 2, the prediction performance is lower, less accurate, but this result is closer to reality. 
+- We can conclude from this that this dataset is rather little correlated, that the variables seems to have relations between them but without having very large and significant ones. 
+- It is therefore difficult to predict whether or not a patient will be readmitted to hospital with the features available in this dataset. We can put out an idea but it will not be very reliable on the subject. 
 
 
 
