@@ -76,10 +76,10 @@ All the results and performance of each model are available in the jupyter noteb
 ### Machine Learning - Models Tuning 
 With the help of the libraries, we can search for the best possible parameters for the different models and therefore try to improve the performance of each one. This was established in this phase. All the results obtained for the different models are also available in the jupyter notebook.
 
-## API 
+### API 
 To make the project a little more visual and accessible, we created a streamlit project that we linked to our python code to create an API. It presents different tabs with the description of the dataset, the notebook, our results in machine learning and an interactive parts. 
 
-## Conclusion
+### Conclusion
 After observing the results, the following conclusions can be drawn. 
 - For case number 1, we can see that the predictions are made with a rather high score but we must qualify this result because the problem is unbalanced. You can't really rely on those results. 
 - For case number 2, the prediction performance is lower, less accurate, but this result is closer to reality. 
