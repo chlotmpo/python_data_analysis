@@ -33,6 +33,12 @@ This section consists of 2 files, we will find our jupyter notebook and its html
   - [Notebook_diabetes.html](./Notebook_diabetes/Notebook_diabetes.html) 
   This is the html export of the previous file. It can open on any browser and allows you to view the code and results simply. 
   
+- [PPT - Full-detailed version](./PPT Full-detailed version.pdf)
+This presentation is complete and includes all the comments of our choicesand steps 
+
+-[PPT - Oral version](./PPT Oral version.pdf)
+This presentation includes less text and is used for an oral presentation of the project
+
 - [ReadMe.md](./README.md)
 You are on the ReadMe.md file. 
 
