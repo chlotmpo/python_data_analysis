@@ -21,7 +21,9 @@ Our analysis focuses on a dataset that containts data on **hospitalized diabetic
   - [description_diabetes](./Dataset/description_diabetes)
   This first document is a detailed description of the dataset, which explains the origin of the data, the meaning of the     differents columns and characteristics. It was the starting point for our analysis. 
   - [diabetic_data](./Dataset/diabetic_data)
-  All data is stored in this file. This is the one we imported into our notebook in order to retrieve the content and process it. 
+  All data is stored in this file. This is the one we imported into our notebook in order to retrieve the content and process it.
+  - [diabetes_df](./Dataset/diabetes_df)
+  Cleaned version of the dataset used in the notebook (generated from the notebook)
   - [id_mapping](./Dataset/id_mapping)
   id_mapping contains the data equivalents needed to map certain columns of the dataset. It was also provided with the dataset.
   - [summary_ML](./Dataset/summary_ML)
