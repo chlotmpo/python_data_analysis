@@ -42,7 +42,8 @@ def navigationBar():
         {'label':'Project', 'id' : 'project'},
         {'label':"Dataset", 'id' : 'dataset'},
         {'label':"Notebook", 'id' : 'notebook'},
-        {'label':"Machine Learning", 'id' : 'ml'}]
+        {'label':"Machine Learning", 'id' : 'ml'},
+        {'label':"Make Your Own Predictions", 'id' : 'pred'}]
     over_theme = {'txc_inactive': '#FFFFFF'} # ,'menu_background':'red','txc_active':'yellow','option_active':'blue'}
 
     # structure NavBar
@@ -67,8 +68,9 @@ def app():
     navigationBar()
     
     # ---------------------------------------------  Content  --------------------------------------------   
-    dataset = load_dataset()
+    dataset, diabetes_df_ml = load_datasets()
     dataset = dataset[:101]
+    diabetes_df_ml = diabetes_df_ml[:10000]
     notebook_html = load_notebook()
     
     if menu_id == 'project': 
@@ -134,7 +136,7 @@ def app():
         st.title('Jupyter Notebook')
         col1, col2, col3 = st.columns([6,1,1])
         with col1:
-            st.write('You can find here our work: ')
+            st.write('You can find here our work:')
         with col3:
             st.download_button(label = 'Download', data = notebook_html, file_name='notebook.html', mime = 'html')
          
@@ -159,7 +161,7 @@ def app():
         st.title('')
         
         # load the summary dataset (results of our ML models)
-        summaryML = pd.read_csv(r"..\\Dataset\\summary_ML.csv", sep =';', header=[1])
+        summaryML = pd.read_csv("Dataset/summary_ML.csv", sep =';', header=[1])
         case1 = summaryML[['Model', 'Score', 'Accuracy']]
         case2 = summaryML[['Model.1', 'Score.1', 'Accuracy.1']]
         case2.columns = case1.columns
@@ -182,18 +184,109 @@ def app():
                     \n because the two categories to predict were unbalanced. \
                     \n In case 2, we lost some accuracy but it is a much more realistic modelization')  
     
+    if menu_id == 'pred':
+        diabetes_df_ml.drop(columns = ['patient_nbr'])
+        
+        st.title('Make Your Own Predictions')
+        st.title('')
+        
+        space, col1, col2 = st.columns([1,4,4])
+        with col1:
+            st.subheader('Select the readmitted status that you want to predict: ')
+        with col2:
+            readmitted = st.radio("", ('Readmission under 30 days', 'Readmission under or above 30 days'))
+            
+        map_readmitted = {"NO" : False,
+                          ">30" : True,
+                          "<30" : False}
+        
+        if readmitted == 'Readmission under or above 30 days':
+            map_readmitted = {"NO" : False,
+                                ">30" : True,
+                                "<30" : True}
+            
+        diabetes_df_ml.readmitted = diabetes_df_ml.readmitted.map(map_readmitted)
+        
+        from sklearn.preprocessing import LabelEncoder
+
+        label_encoder = LabelEncoder()
+
+        diabetes_df_ml["race"] = label_encoder.fit_transform(diabetes_df_ml["race"].astype(str))
+
+        for column in diabetes_df_ml.select_dtypes(include=['object']).columns:
+            diabetes_df_ml[column] = label_encoder.fit_transform(diabetes_df_ml[column])
+    
+        for column in diabetes_df_ml.select_dtypes(include=['bool']).columns:
+            diabetes_df_ml[column] = label_encoder.fit_transform(diabetes_df_ml[column])
+        
+        space, col1, col2 = st.columns([1,4,4])
+        with col1:
+            st.subheader('Select the features you want to use to predict readmission:')
+        with col2:
+            features = st.multiselect('', diabetes_df_ml.drop(columns = ['readmitted']).columns)
+        
+        #diabetes_df_ml = diabetes_df_ml[features + 'readmitted']
+        
+        if st.button('Predict'):
+                
+            #// slider random split size
+            
+            from sklearn.model_selection import train_test_split
+
+            x = diabetes_df_ml.loc[:, diabetes_df_ml.columns != 'readmitted'] # every feature except the one that we will try to predict
+            y = diabetes_df_ml.loc[:, 'readmitted'] # readmitted feature
+            x_train, x_test, y_train, y_test = train_test_split(x,y, test_size = 0.33)
+            
+            from sklearn.preprocessing import StandardScaler
+
+            scaler = StandardScaler()
+            scaler.fit(x_train)
+            x_train = scaler.transform(x_train)
+            x_test = scaler.transform(x_test)
+        
+            from sklearn.metrics import accuracy_score, confusion_matrix
+        
+            
+            from sklearn.ensemble import RandomForestClassifier
+            
+            clf = RandomForestClassifier(n_estimators = 100, 
+                                         bootstrap = True, 
+                                         max_features = 'log2', 
+                                         min_samples_split = 8)
+            clf = clf.fit(x_train, y_train)
+            
+            ## Computing predictions
+            y_pred = clf.predict(x_test)
+
+            ## Evaluating the model's performance
+            cm = confusion_matrix(y_test, y_pred)
+            ac = accuracy_score(y_test,y_pred)
+            
+            space, col1, col2 = st.columns([1,4,4])
+            with col1:
+                st.title('Accuracy: ')
+            with col2:
+                st.title(ac)
+            
+    
+    
+    
+    
+    
 # ----------------------------------------  Fonctions  ----------------------------------------
 
 # Chargement du dataset en cache
 @st.cache # We store the dataset in cache so it can be displayed faster
-def load_dataset():
-    path = r"..\\Dataset\\diabetic_data.csv"
-    dataset = pd.read_csv(path, sep =',', na_values="?", low_memory = False)
-    return dataset
+def load_datasets():
+    path = "Dataset/"
+    dataset = pd.read_csv(path + 'diabetic_data.csv', sep =',', na_values="?", low_memory = False)
+    cleaned_dataset = pd.read_csv(path + 'diabetes_df.csv', sep =';')
+    
+    return dataset, cleaned_dataset
 
 @st.cache
 def load_notebook():
-    HtmlFile = open(r"..\\Notebook_diabetes\\Notebook_diabetes.html", 'r', encoding='utf-8')
+    HtmlFile = open("Notebook_diabetes/Notebook_diabetes.html", 'r', encoding='utf-8')
     return HtmlFile.read()
 
 # -------------------------------------------  Main  -------------------------------------------
