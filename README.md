@@ -36,7 +36,7 @@ This section consists of 2 files, we will find our jupyter notebook and its html
 - [PPT - Full-detailed version](./PPT Full-detailed version.pdf)
 This presentation is complete and includes all the comments of our choicesand steps 
 
--[PPT - Oral version](./PPT Oral version.pdf)
+- [PPT - Oral version](./PPT Oral version.pdf)
 This presentation includes less text and is used for an oral presentation of the project
 
 - [ReadMe.md](./README.md)
