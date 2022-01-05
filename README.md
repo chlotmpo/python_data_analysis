@@ -32,7 +32,8 @@ Our analysis focuses on a dataset that containts data on **hospitalized diabetic
 - [Notebook_diabetes](./Notebook_diabetes/)
 This section consists of 2 files, we will find our jupyter notebook and its html version, with all our python code that allowed us to clean, visualize, analyze and train our data. 
   - [Notebook_diabetes.ipynb](./Notebook_diabetes/Notebook_diabetes.ipynb)
-  This file with ipynb terminaison corresponds to the notebook created on jupyter. This is where all the code and results are stored. So you can see the blocks of code, visualization graphs and other titles and comments that explain the progress of the project throughout the notebook. 
+  This file with ipynb terminaison corresponds to the notebook created on jupyter. This is where all the code and results are stored. So you can see the blocks of code, visualization graphs and other titles and comments that explain the progress of the project throughout the notebook.    
+  This notebook can be open at [https://nbviewer.org/github/chlotmpo/python_data_analysis/blob/main/Notebook_diabetes/Notebook_diabetes.ipynb](https://nbviewer.org/github/chlotmpo/python_data_analysis/blob/main/Notebook_diabetes/Notebook_diabetes.ipynb)
   - [Notebook_diabetes.html](./Notebook_diabetes/Notebook_diabetes.html) 
   This is the html export of the previous file. It can open on any browser and allows you to view the code and results simply. 
   
