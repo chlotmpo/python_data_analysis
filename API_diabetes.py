@@ -28,8 +28,8 @@ def structure():
                         color:#ffffff;
                     }
                     div.stButton > button:hover {
-                        background-color: #00ff00;
-                        color:#ff0000;
+                        background-color: #ffffff;
+                        color:#0099ff;
                         }
                     </style>""", unsafe_allow_html=True)
 # --------------------------------------------------------------------------------------------------
@@ -188,86 +188,170 @@ def app():
         diabetes_df_ml.drop(columns = ['patient_nbr'])
         
         st.title('Make Your Own Predictions')
-        st.title('')
+        st.write("Now you can make your own predictions using whatever you want \
+                \n Try to have the best accuracy !")
         
-        space, col1, col2 = st.columns([1,4,4])
+        # SELECT READMITTED
+        col1, col2 = st.columns([2,1])
         with col1:
             st.subheader('Select the readmitted status that you want to predict: ')
         with col2:
             readmitted = st.radio("", ('Readmission under 30 days', 'Readmission under or above 30 days'))
             
-        map_readmitted = {"NO" : False,
-                          ">30" : True,
-                          "<30" : False}
-        
-        if readmitted == 'Readmission under or above 30 days':
-            map_readmitted = {"NO" : False,
-                                ">30" : True,
-                                "<30" : True}
-            
-        diabetes_df_ml.readmitted = diabetes_df_ml.readmitted.map(map_readmitted)
-        
-        from sklearn.preprocessing import LabelEncoder
-
-        label_encoder = LabelEncoder()
-
-        diabetes_df_ml["race"] = label_encoder.fit_transform(diabetes_df_ml["race"].astype(str))
-
-        for column in diabetes_df_ml.select_dtypes(include=['object']).columns:
-            diabetes_df_ml[column] = label_encoder.fit_transform(diabetes_df_ml[column])
-    
-        for column in diabetes_df_ml.select_dtypes(include=['bool']).columns:
-            diabetes_df_ml[column] = label_encoder.fit_transform(diabetes_df_ml[column])
-        
-        space, col1, col2 = st.columns([1,4,4])
+        # SELECT FEATURES
+        col1, col2 = st.columns([2,1])
         with col1:
             st.subheader('Select the features you want to use to predict readmission:')
         with col2:
-            features = st.multiselect('', diabetes_df_ml.drop(columns = ['readmitted']).columns)
+            features = st.multiselect('', diabetes_df_ml.drop(columns = ['patient_nbr','readmitted']).columns.values.tolist()[1:])
         
-        #diabetes_df_ml = diabetes_df_ml[features + 'readmitted']
         
-        if st.button('Predict'):
+        
+        diabetes_df_ml = diabetes_df_ml[features + ['readmitted']]
+        
+            
+        # SELECT ML MODEL
+        col1, col2 = st.columns([2,1])
+        with col1:
+            st.subheader('Select the Machine Learning model:')
+        with col2:
+            model = st.selectbox('', ('K-Nearest Neighbors', 'Logistic Regression', 'Linear SVC', 'Random Forest', 'Adaptive boosting', 
+                                       'Adaptive boosting', 'Decision Tree', 'Extra Trees', 'Naive Bayes'))
+        
+        # SELECT SPLIT RATIO
+        col1, col2 = st.columns([2,1])
+        with col1:
+            st.subheader('Select the split ratio:')
+        with col2:
+            split = st.slider('', 0.0, 100.0, (65.0))
+            split = split/100
+        
+        st.title('')
+        
+        # Readmitted Processing
+        if readmitted == 'Readmission under or above 30 days':
+            map_readmitted = {"NO" : False, ">30" : True, "<30" : True}
+        else:
+            map_readmitted = {"NO" : False, ">30" : True, "<30" : False}
+        diabetes_df_ml.readmitted = diabetes_df_ml.readmitted.map(map_readmitted)
+        
+        # Features Processing
+        from sklearn.preprocessing import LabelEncoder
+        label_encoder = LabelEncoder()
+        #diabetes_df_ml["race"] = label_encoder.fit_transform(diabetes_df_ml["race"].astype(str))
+        for column in diabetes_df_ml.select_dtypes(include=['object']).columns:
+            diabetes_df_ml[column] = label_encoder.fit_transform(diabetes_df_ml[column])
+        for column in diabetes_df_ml.select_dtypes(include=['bool']).columns:
+            diabetes_df_ml[column] = label_encoder.fit_transform(diabetes_df_ml[column])
+    
+        if len(features) > 0:
+            col1, col2, col3 = st.columns([1, 2, 2])
+            #space, col3 = st.columns([4, 1])
+            
                 
-            #// slider random split size
+            with col3:
+                if st.button('Predict Readmission'):
+                    
+                    # SHUFFLING ROWS
+                    diabetes_df_ml = diabetes_df_ml.sample(n = len(diabetes_df_ml), random_state = 42)
+                    
+                    # SPLITTING DATA WITH RATIO ENTERED BY USER
+                    from sklearn.model_selection import train_test_split
+                    x = diabetes_df_ml.loc[:, diabetes_df_ml.columns != 'readmitted'] # every feature except the one that we will try to predict
+                    y = diabetes_df_ml.loc[:, 'readmitted'] # readmitted feature
+                    x_train, x_test, y_train, y_test = train_test_split(x,y, test_size = 1 - split)
+                    
+                    # SCALING DATA
+                    from sklearn.preprocessing import StandardScaler
+                    scaler = StandardScaler()
+                    scaler.fit(x_train)
+                    x_train = scaler.transform(x_train)
+                    x_test = scaler.transform(x_test)
+                    
+                    # COMPUTING PREDICTION DEPENDING ON SELECTED MODEL
+                    if model == 'K-Nearest Neighbors':
+                        from sklearn.neighbors import KNeighborsClassifier
+                        knn = KNeighborsClassifier(n_neighbors = 5)
+                        knn.fit(x_train, y_train)
+                        y_pred = knn.predict(x_test)
+                        
+                    if model == 'Logistic Regression':
+                        from sklearn.linear_model import LogisticRegression
+                        logreg = LogisticRegression()
+                        logreg.fit(x_train,y_train)
+                        y_pred = logreg.predict(x_test)
+                        
+                    if model == 'Linear SVC':
+                        from sklearn.svm import LinearSVC
+                        lsvc  = LinearSVC( dual = False)
+                        lsvc.fit(x_train, y_train)
+                        y_pred = lsvc.predict(x_test)
+                        
+                    if model == 'Random Forest':
+                        from sklearn.ensemble import RandomForestClassifier
+                        clf = RandomForestClassifier(n_estimators = 100, 
+                                                    bootstrap = True, 
+                                                    max_features = 'log2', 
+                                                    min_samples_split = 8)
+                        clf = clf.fit(x_train, y_train)
+                        y_pred = clf.predict(x_test)
+                        
+                    if model == 'Adaptive boosting':
+                        from sklearn.ensemble import AdaBoostClassifier
+                        ab = AdaBoostClassifier(algorithm = 'SAMME',
+                                                learning_rate = 0.95,
+                                                n_estimators = 100)
+                        ab.fit(x_train, y_train)
+                        y_pred = ab.predict(x_test)
+                    
+                    if model == 'Decision Tree':
+                        from sklearn.tree import DecisionTreeClassifier
+                        clf = DecisionTreeClassifier(max_depth=None,
+                                                     min_samples_split=2,
+                                                     random_state=41)
+                        clf.fit( x_train, y_train)
+                        y_pred = clf.predict(x_test)
+                        
+                    if model == 'Extra Trees':
+                        from sklearn.ensemble import ExtraTreesClassifier
+                        clf = ExtraTreesClassifier(n_estimators=10,
+                                                   max_depth=None,
+                                                   min_samples_split=2, 
+                                                   random_state=41)
+                        clf.fit(x_train, y_train)
+                        y_pred = clf.predict(x_test)
+                        
+                    if model == 'Naive Bayes':
+                        from sklearn.naive_bayes import GaussianNB
+                        gnb = GaussianNB(var_smoothing=1.0)
+                        gnb.fit(x_train, y_train)
+                        y_pred = gnb.predict(x_test)
+                    
+                    from sklearn.metrics import accuracy_score
+                    ac = accuracy_score(y_test, y_pred)
+                    st.title('')
+                    st.metric("Accuracy", str(round(ac*100,2)) + " %")
             
-            from sklearn.model_selection import train_test_split
-
-            x = diabetes_df_ml.loc[:, diabetes_df_ml.columns != 'readmitted'] # every feature except the one that we will try to predict
-            y = diabetes_df_ml.loc[:, 'readmitted'] # readmitted feature
-            x_train, x_test, y_train, y_test = train_test_split(x,y, test_size = 0.33)
             
-            from sklearn.preprocessing import StandardScaler
-
-            scaler = StandardScaler()
-            scaler.fit(x_train)
-            x_train = scaler.transform(x_train)
-            x_test = scaler.transform(x_test)
-        
-            from sklearn.metrics import accuracy_score, confusion_matrix
-        
-            
-            from sklearn.ensemble import RandomForestClassifier
-            
-            clf = RandomForestClassifier(n_estimators = 100, 
-                                         bootstrap = True, 
-                                         max_features = 'log2', 
-                                         min_samples_split = 8)
-            clf = clf.fit(x_train, y_train)
-            
-            ## Computing predictions
-            y_pred = clf.predict(x_test)
-
-            ## Evaluating the model's performance
-            cm = confusion_matrix(y_test, y_pred)
-            ac = accuracy_score(y_test,y_pred)
-            
-            space, col1, col2 = st.columns([1,4,4])
-            with col1:
-                st.title('Accuracy: ')
             with col2:
-                st.title(ac)
+                st.title('')
+                st.title('')
+                st.subheader('Trying to predict ' + str(readmitted) + ' over ' + str(len(features)) + ' features with ' + str(model) + ':')
+             
+                
             
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    
+    
+    
     
     
     
