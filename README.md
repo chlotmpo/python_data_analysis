@@ -11,7 +11,7 @@ As part of the python for data analysis course, the aim of end of the semester's
 This section contains all the files necessary for the operation and management of the Streamlit API. The latter makes it possible to visualize in another way the entire project.     
 The link to access it is: [https://share.streamlit.io/chlotmpo/python_data_analysis/main/API_diabetes.py](https://share.streamlit.io/chlotmpo/python_data_analysis/main/API_diabetes.py)
   - [.streamlit](./API_diabetes(streamlit)/.streamlit/)
-  This is the API configuration file.
+  This is the folder containing the API configuration file.
   - [API_diabetes.py](./API_diabetes(streamlit)/API_diabetes.py/)
   This file is the one that created the design of the API and also allows it to work. 
   
