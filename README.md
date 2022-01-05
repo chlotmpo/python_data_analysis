@@ -17,9 +17,9 @@ This section contains all the files necessary for the operation and management o
 - [Dataset](./Dataset)
 This section contains all files related to and linked to this dataset of our project.
 Our analysis focuses on a dataset that containts data on **hospitalized diabetic patients**. 
-- [description_diabetes](./Dataset/description_diabetes)
+  - [description_diabetes](./Dataset/description_diabetes)
   This first document is a detailed description of the dataset, which explains the origin of the data, the meaning of the     differents columns and characteristics. It was the starting point for our analysis. 
-   - [diabetic_data](./Dataset/diabetic_data)
+  - [diabetic_data](./Dataset/diabetic_data)
   All data is stored in this file. This is the one we imported into our notebook in order to retrieve the content and process it. 
   - [id_mapping](./Dataset/id_mapping)
   id_mapping contains the data equivalents needed to map certain columns of the dataset. It was also provided with the dataset.
@@ -32,7 +32,8 @@ This section consists of 2 files, we will find our jupyter notebook and its html
   This file with ipynb terminaison corresponds to the notebook created on jupyter. This is where all the code and results are stored. So you can see the blocks of code, visualization graphs and other titles and comments that explain the progress of the project throughout the notebook. 
   - [Notebook_diabetes.html](./Notebook_diabetes/Notebook_diabetes.html) 
   This is the html export of the previous file. It can open on any browser and allows you to view the code and results simply. 
--[ReadMe.md](./README.md)
+  
+- [ReadMe.md](./README.md)
 You are on the ReadMe.md file. 
 
 
